@@ -10,6 +10,25 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with: { gradle-version: 9.4.1 }
       - run: gradle build --no-daemon
+      - name: Inspect Minecraft classes
+        if: always()
+        run: |
+          JAR=""
+          for j in $(find ~/.gradle -name '*.jar' 2>/dev/null); do
+            if unzip -l "$j" 2>/dev/null | grep -q 'net/minecraft/client/renderer/feature/ItemFeatureRenderer.class'; then JAR="$j"; break; fi
+          done
+          echo "JAR=$JAR" > inspect.txt
+          for c in net.minecraft.client.renderer.feature.ItemFeatureRenderer 'net.minecraft.client.renderer.SubmitNodeStorage$ItemSubmit' net.minecraft.client.renderer.SubmitNodeCollector net.minecraft.client.renderer.item.ItemStackRenderState 'net.minecraft.client.renderer.item.ItemStackRenderState$LayerRenderState' net.minecraft.client.renderer.rendertype.RenderSetup net.minecraft.client.renderer.rendertype.RenderType net.minecraft.client.renderer.rendertype.TextureTransform net.minecraft.client.renderer.rendertype.RenderTypes; do
+            javap -p -cp "$JAR" "$c" >> inspect.txt 2>&1
+          done
+          MV=$(unzip -l "$JAR" | grep -o 'net/minecraft/[A-Za-z/]*MeshView.class' | head -1 | sed 's/.class$//; s#/#.#g')
+          echo "MESHVIEW=$MV" >> inspect.txt
+          javap -p -cp "$JAR" "$MV" >> inspect.txt 2>&1 || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mc-inspect
+          path: inspect.txt
       - uses: actions/upload-artifact@v4
         with:
           name: glintforge-jar
