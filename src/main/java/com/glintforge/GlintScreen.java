@@ -14,8 +14,8 @@ import net.minecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleConsumer;
+import java.util.function.IntConsumer;
 
-/** Widget-only settings screen (no custom render code, so it survives GUI render API changes). */
 public class GlintScreen extends Screen {
     private final Screen parent;
     private String itemId = "";
@@ -67,7 +67,7 @@ public class GlintScreen extends Screen {
             rebuildWidgets();
         }).bounds(x + w / 2 + 2, y + 24, w / 2 - 2, 20).build());
 
-        addRenderableWidget(new Slider(x, y + 52, w, "Size", 0.25, 4.0, draft.size, v -> draft.size = (float) v, "%.2fx"));
+        addRenderableWidget(new StepSlider(x, y + 52, w, draft.pixelSize, v -> draft.pixelSize = v));
         addRenderableWidget(new Slider(x, y + 76, w, "Opacity", 0.0, 1.0, draft.opacity, v -> draft.opacity = (float) v, "%.0f%%", 100));
         addRenderableWidget(new Slider(x, y + 100, w, "Speed", 0.0, 4.0, draft.speed, v -> draft.speed = (float) v, "%.2fx"));
 
@@ -118,6 +118,35 @@ public class GlintScreen extends Screen {
 
     @Override
     public void onClose() { Minecraft.getInstance().setScreen(parent); }
+
+    /** Snaps to 16x, 32x, 64x, 128x, 256x, 512x. */
+    private static final class StepSlider extends AbstractSliderButton {
+        private static final int[] SIZES = { 16, 32, 64, 128, 256, 512 };
+        private final IntConsumer onChange;
+
+        StepSlider(int x, int y, int w, int currentSize, IntConsumer onChange) {
+            super(x, y, w, 20, Component.empty(), indexOf(currentSize) / 5.0);
+            this.onChange = onChange;
+            updateMessage();
+        }
+
+        private static int indexOf(int s) {
+            for (int i = 0; i < SIZES.length; i++) if (SIZES[i] == s) return i;
+            return 0;
+        }
+
+        private int idx() { return (int) Math.round(value * 5); }
+
+        @Override protected void updateMessage() {
+            int s = SIZES[idx()];
+            setMessage(Component.literal("Size: " + s + "x" + (s == 16 ? " (default)" : "")));
+        }
+
+        @Override protected void applyValue() {
+            value = idx() / 5.0;
+            onChange.accept(SIZES[idx()]);
+        }
+    }
 
     private static final class Slider extends AbstractSliderButton {
         private final String label, fmt;
