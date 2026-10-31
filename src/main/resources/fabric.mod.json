@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "glintforge",
+  "version": "${version}",
+  "name": "GlintForge",
+  "description": "Per-item enchantment glint tweaks: size, opacity, speed and custom overlay textures.",
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": { "client": [ "com.glintforge.GlintForge" ] },
+  "mixins": [ { "config": "glintforge.mixins.json", "environment": "client" } ],
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "minecraft": "~26.1",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}
