@@ -3,6 +3,6 @@
   "minVersion": "0.8",
   "package": "com.glintforge.mixin",
   "compatibilityLevel": "JAVA_21",
-  "client": [ "ItemModelResolverMixin", "ItemStackRenderStateMixin" ],
+  "client": [ "ItemModelResolverMixin", "ItemStackRenderStateMixin", "LayerRenderStateAccessor", "ItemFeatureRendererMixin" ],
   "injectors": { "defaultRequire": 0 }
 }
