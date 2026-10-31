@@ -18,12 +18,12 @@ jobs:
             if unzip -l "$j" 2>/dev/null | grep -q 'net/minecraft/client/renderer/feature/ItemFeatureRenderer.class'; then JAR="$j"; break; fi
           done
           echo "JAR=$JAR" > inspect.txt
-          for c in net.minecraft.client.renderer.feature.ItemFeatureRenderer 'net.minecraft.client.renderer.SubmitNodeStorage$ItemSubmit' net.minecraft.client.renderer.SubmitNodeCollector net.minecraft.client.renderer.item.ItemStackRenderState 'net.minecraft.client.renderer.item.ItemStackRenderState$LayerRenderState' net.minecraft.client.renderer.rendertype.RenderSetup net.minecraft.client.renderer.rendertype.RenderType net.minecraft.client.renderer.rendertype.TextureTransform net.minecraft.client.renderer.rendertype.RenderTypes; do
+          for c in 'net.minecraft.client.renderer.rendertype.RenderSetup$RenderSetupBuilder' net.minecraft.client.renderer.item.ItemModelResolver; do
             javap -p -cp "$JAR" "$c" >> inspect.txt 2>&1
           done
-          MV=$(unzip -l "$JAR" | grep -o 'net/minecraft/[A-Za-z/]*MeshView.class' | head -1 | sed 's/.class$//; s#/#.#g')
-          echo "MESHVIEW=$MV" >> inspect.txt
-          javap -p -cp "$JAR" "$MV" >> inspect.txt 2>&1 || true
+          javap -p -cp "$JAR" com.mojang.blaze3d.systems.RenderSystem 2>&1 | grep -i sampler >> inspect.txt || true
+          SC=$(unzip -l "$JAR" | grep -o 'com/mojang/blaze3d/[A-Za-z/]*SamplerCache.class' | head -1 | sed 's/.class$//; s#/#.#g')
+          if [ -n "$SC" ]; then javap -p -cp "$JAR" "$SC" >> inspect.txt 2>&1; fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
