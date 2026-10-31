@@ -70,7 +70,7 @@ public final class GlintVariants {
         });
 
         RenderSetup setup = RenderSetup.builder(RenderPipelines.GLINT)
-                .withTexture("Sampler0", texId, true)
+                .withTexture("Sampler0", texId)
                 .setTextureTransform(transform)
                 .createRenderSetup();
         return new Variant(RenderType.create("glintforge_" + n, setup), texId);
