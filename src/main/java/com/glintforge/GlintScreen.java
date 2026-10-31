@@ -40,7 +40,7 @@ public class GlintScreen extends Screen {
         int cx = width / 2, w = 220, x = cx - w / 2;
         int y = Math.max(28, height / 2 - 100);
 
-        addRenderableWidget(new StringWidget(x, 10, w, 9, title, font).alignCenter());
+        addRenderableWidget(new StringWidget(x, 10, w, 9, title, font));
 
         idBox = new EditBox(font, x, y, w, 20, Component.literal("Item ID"));
         idBox.setMaxLength(120);
@@ -96,7 +96,7 @@ public class GlintScreen extends Screen {
         addRenderableWidget(Button.builder(Component.literal("Done"), b -> onClose())
                 .bounds(x + 150, y + 178, 70, 20).build());
 
-        status = new StringWidget(x, y + 204, w, 9, Component.literal(statusText), font).alignCenter();
+        status = new StringWidget(x, y + 204, w, 9, Component.literal(statusText), font);
         addRenderableWidget(status);
     }
 
